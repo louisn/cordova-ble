@@ -1555,7 +1555,27 @@ static int EVOPerhiperalAssociatedObjectKey = 42;
 	// prepareForJson those objects.
 	// Since we call prepareForJson: with an NSDictionary we will get
 	// back an NSDictionary, so this type cast should be safe.
+    
+    if ( [peripheral.name containsString:@"ECL"]){
+        NSLog(@"%@", advertisementData);
+        NSLog(@"%@", advertisementData[CBAdvertisementDataLocalNameKey]);
+        NSString* advertisedName = peripheral.name;
+        if([peripheral.name length]>3){
+            NSLog(@"%ul",[peripheral.name length]);
+            const char * c = [peripheral.name UTF8String];
+            NSString* deviceNamePrefix = [peripheral.name substringToIndex:3];
+            NSString* deviceStr = [[NSString alloc] initWithFormat:@"%ld",c[3]];
+            NSString* fixedName = [deviceNamePrefix stringByAppendingString:deviceStr];
+            [advertisementData setValue: fixedName forKey: CBAdvertisementDataLocalNameKey];
+        }
+    }
+
 	NSDictionary* newDict = (NSDictionary*) [self prepareForJson: advertisementData];
+    
+    if ( [peripheral.name containsString:@"ECL"]){
+        NSLog(@"%@", newDict);
+    }
+
 
 	[self
 		sendScanInfoForPeriperhal: peripheral
@@ -1753,7 +1773,10 @@ static int EVOPerhiperalAssociatedObjectKey = 42;
 		@"rssi" : RSSI,
 		@"advertisementData" : advertisementData,
 		@"name" : (peripheral.name != nil) ? peripheral.name : [NSNull null],
-	};
+    };
+    if ( [peripheral.name containsString:@"ECL"]){
+        NSLog(@"%@", info);
+    }
 
 	// Send back data to JS.
 	if (nil != self.startScanCommand)
